@@ -1,0 +1,149 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# TypeScript compiled output
+dist/
+build/
+lib/
+*.js
+*.js.map
+*.d.ts
+
+# But don't ignore these TypeScript files
+!*.d.ts
+!*.d.ts.map
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# Testing
+coverage/
+.nyc_output/
+.jest/
+__tests__/coverage/
+.vscode-test/
+
+# Build tools
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Debug files
+*.pid
+*.seed
+*.pid.lock
+
+# Security
+*.pem
+*.key
+*.crt
+*.csr
+
+# Production specific
+*.tgz
+*.tar.gz
+
+# MongoDB files
+dump/
+mongodb-data/
+
+# Redis files
+dump.rdb
+
+# PM2 files
+.pm2/
+
+# TypeScript cache
+.tscache/
+*.tsbuildinfo
+
+# ESLint cache
+.eslintcache
+
+# Prettier cache
+.prettiercache
+
+# Node.js
+node-*
+
+# Webpack
+webpack-stats.json
+
+# Serverless
+.serverless/
+
+# Stencil
+.stencil/
+
+# Lerna
+lerna-debug.log
+
+# NestJS
+nest-cli.json
+
+# Nuxt.js
+.nuxt
+.nuxtrc
+
+# Gatsby
+.cache/
+public/
+
+# Storybook
+storybook-static/
+
+# Rollup
+rollup.config.js
+
+# Vite
+vite.config.js.*
+vite.config.ts.*
