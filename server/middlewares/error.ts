@@ -30,7 +30,7 @@ export const ErrorMiddleware = (err: any, req: Request, res: Response, next: Nex
         err = new ErrorHandler(message, 400);
      }
 
-     res.status(err.status).json({
+     res.status(parseInt(err.statusCode)).json({
         success: false,
         message: err.message
      })

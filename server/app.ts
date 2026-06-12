@@ -8,6 +8,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { ErrorMiddleware } from "./middlewares/error";
+import userRouter from "./routes/user.routes";
 
 dotenv.config();
 
@@ -23,6 +24,9 @@ app.use(
     origin: process.env.ORIGIN,
   }),
 );
+
+// ROUTES 
+app.use("/api/v1", userRouter);
 
 // API HEALTH
 app.get("/health", (req: Request, res: Response, next: NextFunction) => {
