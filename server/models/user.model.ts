@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema} from "mongoose";
+import mongoose, { Document, Model, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -62,7 +62,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema({
       courseId: String,
     },
   ],
-}, {timestamps: true});
+}, { timestamps: true });
 
 
 // Hash Password 
@@ -73,23 +73,10 @@ userSchema.pre<IUser>("save", async function () {
   this.password = await bcrypt.hash(this.password, 10);
 });
 
-// Sign Access Token
-userSchema.methods.signAccessToken = function (): string {
-  return jwt.sign({ id: this._id }, process.env.ACCESS_TOKEN_SECRET as string, {
-    expiresIn: "15m",
-  }) ;
-}
-
-// Sign Refresh Token
-userSchema.methods.signRefreshToken = function (): string {
-  return jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN_SECRET as string, {
-    expiresIn: "7d",
-  }) ;
-}
 
 // Compare Password 
-userSchema.methods.comparePassword = async function(enteredPassowrd: string): Promise<boolean>{
-    return await bcrypt.compare(enteredPassowrd, this.password)
+userSchema.methods.comparePassword = async function (enteredPassowrd: string): Promise<boolean> {
+  return await bcrypt.compare(enteredPassowrd, this.password)
 }
 
 const UserModel: Model<IUser> = mongoose.model("User", userSchema);

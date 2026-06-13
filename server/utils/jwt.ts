@@ -3,6 +3,7 @@ dotenv.config();
 import { Response } from "express";
 import { IUser } from "../models/user.model";
 import { redis } from "./redis";
+import jwt from "jsonwebtoken"
 
 interface ITokenOptions {
     expires: Date;
@@ -12,9 +13,21 @@ interface ITokenOptions {
     secure?: boolean;
 }
 
-export const sendToken = (user: IUser, statusCode: number, res: Response) => {
-    const accessToken = user.signAccessToken();
-    const refreshToken = user.signRefreshToken();
+export const signAccessToken = function (id: string): string {
+    return jwt.sign({ id }, process.env.ACCESS_TOKEN_SECRET as string, {
+        expiresIn: "59m",
+    });
+}
+
+export const signRefreshToken = function (id: string): string {
+    return jwt.sign({ id }, process.env.REFRESH_TOKEN_SECRET as string, {
+        expiresIn: "3d",
+    });
+}
+
+export const sendToken = (user: IUser, statusCode: number, res: Response, sendAccessTokenOnly: boolean) => {
+    const accessToken = signAccessToken(user._id.toString());
+    const refreshToken = signRefreshToken(user._id.toString());
 
     redis.set(user._id.toString(), JSON.stringify(user) as any);
 
@@ -40,13 +53,23 @@ export const sendToken = (user: IUser, statusCode: number, res: Response) => {
         refreshTokenOptions.secure = true;
     }
 
-    res.cookie("access_token", accessToken, accessTokenOptions);
-    res.cookie("refresh_token", refreshToken, refreshTokenOptions);
 
-    res.status(statusCode).json({
-        success: true,
-        accessToken,
-        refreshToken,
-    });
+
+    if (!sendAccessTokenOnly) {
+        res.cookie("access_token", accessToken, accessTokenOptions);
+        res.cookie("refresh_token", refreshToken, refreshTokenOptions);
+        res.status(statusCode).json({
+            success: true,
+            accessToken,
+            refreshToken,
+        });
+    } else {
+        res.cookie("access_token", accessToken, accessTokenOptions);
+        res.status(statusCode).json({
+            success: true,
+            accessToken,
+        });
+    }
 
 }
+

@@ -3,7 +3,7 @@ import { CatchAsyncErrors } from "../middlewares/catchAsyncErrors";
 import { NextFunction, Request, Response } from "express";
 import UserModel, { IUser } from "../models/user.model";
 import ErrorHandler from "../utils/errorHandler";
-import jwt, { Secret } from "jsonwebtoken";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import ejs from "ejs";
 import path from "node:path";
 import sendMail from "../utils/sendMail";
@@ -152,7 +152,9 @@ export const loginUser = CatchAsyncErrors(async (req: Request, res: Response, ne
       return next(new ErrorHandler("Invalid email or password.", 400));
     }
 
-    sendToken(user, 200, res);
+    console.log("Login User:", user)
+
+    sendToken(user, 200, res, false);
 
   } catch (error: any) {
     return next(new ErrorHandler(error.message, 400));
@@ -163,8 +165,8 @@ export const loginUser = CatchAsyncErrors(async (req: Request, res: Response, ne
 // User Logout
 export const logoutUser = CatchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    res.cookie("refreshToken", "", {maxAge: 1});
-    res.cookie("access_token", "", {maxAge: 1});
+    res.cookie("refreshToken", "", { maxAge: 1 });
+    res.cookie("access_token", "", { maxAge: 1 });
     const userId = req.user?._id || "";
 
     redis.del(userId.toString())
@@ -175,5 +177,30 @@ export const logoutUser = CatchAsyncErrors(async (req: Request, res: Response, n
     });
   } catch (error: any) {
     return next(new ErrorHandler(error.message, 400));
+  }
+});
+
+
+// Refresh access Token 
+export const refreshAccessToken = CatchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const refresh_token = req.cookies.refresh_token;
+
+    const decoded = jwt.verify(refresh_token, process.env.REFRESH_TOKEN_SECRET!) as JwtPayload;
+
+    const session = await redis.get(decoded.id);
+
+    if (!session) {
+      return next(new ErrorHandler("Session expired", 400));
+    }
+
+    const user: IUser = JSON.parse(session);
+
+    console.log(user)
+
+    return sendToken(user, 200, res, true);
+
+  } catch (error: any) {
+    return next(new ErrorHandler(error.message, 500))
   }
 });
