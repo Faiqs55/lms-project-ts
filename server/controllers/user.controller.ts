@@ -9,6 +9,7 @@ import path from "node:path";
 import sendMail from "../utils/sendMail";
 import { sendToken } from "../utils/jwt";
 import { redis } from "../utils/redis";
+import { getUserById } from "../services/user.service";
 dotenv.config();
 
 // Register User
@@ -204,3 +205,14 @@ export const refreshAccessToken = CatchAsyncErrors(async (req: Request, res: Res
     return next(new ErrorHandler(error.message, 500))
   }
 });
+
+
+// Get User Info 
+export const getUserInfo = CatchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const id = req.user?._id;
+    getUserById(id?.toString() || "", res)
+  } catch (error: any) {
+    return next(new ErrorHandler(error.message, 500))
+  }
+})
