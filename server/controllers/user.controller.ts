@@ -153,7 +153,6 @@ export const loginUser = CatchAsyncErrors(async (req: Request, res: Response, ne
       return next(new ErrorHandler("Invalid email or password.", 400));
     }
 
-    console.log("Login User:", user)
 
     sendToken(user, 200, res, false);
 
@@ -197,7 +196,8 @@ export const refreshAccessToken = CatchAsyncErrors(async (req: Request, res: Res
 
     const user: IUser = JSON.parse(session);
 
-    console.log(user)
+    req.user = user;
+
 
     return sendToken(user, 200, res, true);
 
@@ -216,3 +216,72 @@ export const getUserInfo = CatchAsyncErrors(async (req: Request, res: Response, 
     return next(new ErrorHandler(error.message, 500))
   }
 })
+
+
+// Social Auth
+interface ISocialAuthBody {
+  email: string;
+  name: string;
+  avatar: string
+}
+
+export const socialAuth = CatchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, name, avatar } = req.body as ISocialAuthBody;
+    const user = await UserModel.findOne({ email });
+
+    if (!user) {
+      const newUser = await UserModel.create({ email, name, avatar: { url: avatar } });
+      sendToken(newUser, 200, res, true);
+    } else {
+      sendToken(user, 200, res, true);
+    }
+
+
+  } catch (error: any) {
+    return next(new ErrorHandler(error.message, 500))
+  }
+});
+
+
+// update user info
+interface IUpdateUserInfo {
+  name?: string;
+  email?: string;
+}
+
+export const updateUserInfo = CatchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { name, email } = req.body as IUpdateUserInfo;
+
+      const userId = req.user?._id;
+      const user = await UserModel.findById(userId);
+
+      if (user && email) {
+        const isEmailExist = await UserModel.findOne({ email });
+        if (!isEmailExist) {
+          user.email = email
+        } else {
+          return next(new ErrorHandler("Email Already Exists.", 400))
+        }
+      }
+
+
+      if (name && user) {
+        user.name = name;
+      }
+
+      await user?.save();
+
+      await redis.set(userId?.toString() || "", JSON.stringify(user));
+
+      res.status(201).json({
+        success: true,
+        user,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);

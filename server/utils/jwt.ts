@@ -53,6 +53,8 @@ export const sendToken = (user: IUser, statusCode: number, res: Response, sendAc
         refreshTokenOptions.secure = true;
     }
 
+    
+
 
 
     if (!sendAccessTokenOnly) {
