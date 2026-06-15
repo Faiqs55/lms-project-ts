@@ -9,6 +9,7 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { ErrorMiddleware } from "./middlewares/error";
 import userRouter from "./routes/user.routes";
+import courseRouter from "./routes/course.routes";
 
 dotenv.config();
 
@@ -26,7 +27,7 @@ app.use(
 );
 
 // ROUTES 
-app.use("/api/v1", userRouter);
+app.use("/api/v1", userRouter, courseRouter);
 
 // API HEALTH
 app.get("/health", (req: Request, res: Response, next: NextFunction) => {
