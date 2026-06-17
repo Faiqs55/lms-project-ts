@@ -9,6 +9,7 @@ import mongoose from "mongoose";
 import path from "node:path";
 import ejs from "ejs"
 import sendMail from "../utils/sendMail";
+import NotificationModel from "../models/notification.model";
 
 export const uploadCourse = CatchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -206,6 +207,12 @@ export const addQuestion = CatchAsyncErrors(
       // save the updated course
       await course?.save();
 
+      await NotificationModel.create({
+        userId: req?.user?._id.toString() as string,
+        title: "New Question Received",
+        message: `You have a new question in ${couseContent.title}`
+      })
+
       res.status(200).json({
         success: true,
         course,
@@ -266,7 +273,11 @@ export const addAnwser = CatchAsyncErrors(
       await course?.save();
 
       if (req.user?._id === question.user._id) {
-        // create a notification
+        await NotificationModel.create({
+          userId: req.user?._id.toString() as string,
+          title: "New Question Reply Received",
+          message: `You have a new question reply in ${couseContent.title}`,
+        });
       } else {
         const data = {
           name: question.user.name,
@@ -313,7 +324,7 @@ export const addReviewController = CatchAsyncErrors(async (req: Request, res: Re
     const userCourseList = req?.user?.courses;
     const courseId = req.params.id;
 
-    const courseExists = userCourseList?.some((course: any) => course._id.toString() === courseId?.toString());
+    const courseExists = userCourseList?.some((course: any) => course.courseId.toString() === courseId?.toString());
     if (!courseExists) {
       return next(new ErrorHandler("You dont have access to this course.", 403));
     }

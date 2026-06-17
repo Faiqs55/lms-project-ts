@@ -11,6 +11,7 @@ import { ErrorMiddleware } from "./middlewares/error";
 import userRouter from "./routes/user.routes";
 import courseRouter from "./routes/course.routes";
 import notificationRouter from "./routes/notification.routes";
+import orderRouter from "./routes/order.routes";
 
 dotenv.config();
 
@@ -28,7 +29,7 @@ app.use(
 );
 
 // ROUTES 
-app.use("/api/v1", userRouter, courseRouter, notificationRouter);
+app.use("/api/v1", userRouter, courseRouter, notificationRouter, orderRouter);
 
 // API HEALTH
 app.get("/health", (req: Request, res: Response, next: NextFunction) => {
