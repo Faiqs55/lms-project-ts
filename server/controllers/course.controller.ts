@@ -178,7 +178,7 @@ export const addQuestion = CatchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { question, courseId, contentId }: IAddQuestionData = req.body;
-      
+
       const course = await CourseModel.findById(courseId);
 
       if (!mongoose.Types.ObjectId.isValid(contentId)) {
@@ -299,3 +299,103 @@ export const addAnwser = CatchAsyncErrors(
     }
   }
 );
+
+
+// Add Review 
+interface IAddReviewData {
+  comment: string;
+  rating: number;
+  user: object;
+}
+
+export const addReviewController = CatchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userCourseList = req?.user?.courses;
+    const courseId = req.params.id;
+
+    const courseExists = userCourseList?.some((course: any) => course._id.toString() === courseId?.toString());
+    if (!courseExists) {
+      return next(new ErrorHandler("You dont have access to this course.", 403));
+    }
+
+    const course = await CourseModel.findById(courseId);
+    const { comment, rating } = req.body as IAddReviewData;
+
+    let reviewData: any = {
+      comment,
+      rating,
+      user: req.user,
+    };
+    course?.reviews.push(reviewData);
+
+    let avg = 0;
+
+    course?.reviews.forEach((rev: any) => {
+      avg += rev.rating;
+    });
+
+    if (course) {
+      course.ratings = avg / course.reviews.length;
+    }
+
+    await course?.save();
+    await redis.set(courseId as string, JSON.stringify(course), "EX", 604800);
+
+    // NOTIFICATION 
+
+    res.status(200).json({
+      success: true,
+      course,
+    })
+
+  } catch (error: any) {
+    return next(new ErrorHandler(error.message, 500))
+  }
+})
+
+
+// Add Review Reply
+interface IAddReviewReply {
+  comment: string;
+  courseId: string;
+  reviewId: string
+}
+
+export const addReviewReplyController = CatchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { comment, reviewId, courseId } = req.body as IAddReviewReply;
+
+    const course = await CourseModel.findById(courseId);
+
+    if (!course) {
+      return next(new ErrorHandler("Course not found.", 404));
+    }
+
+    const review = course.reviews.find((rev: any) => {
+      return rev._id.toString() === reviewId
+    });
+
+    if (!review) {
+      return next(new ErrorHandler("Review not found.", 404));
+    }
+
+    const replyData: any = {
+      user: req.user,
+      comment,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    review.commentReplies.push(replyData);
+    await course.save();
+    await redis.set(courseId, JSON.stringify(course), "EX", 604800);
+
+    res.status(200).json({
+      success: true,
+      course,
+    });
+
+  } catch (error: any) {
+    return next(new ErrorHandler(error.message, 500))
+  }
+})
