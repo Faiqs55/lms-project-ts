@@ -10,6 +10,7 @@ import dotenv from "dotenv";
 import { ErrorMiddleware } from "./middlewares/error";
 import userRouter from "./routes/user.routes";
 import courseRouter from "./routes/course.routes";
+import notificationRouter from "./routes/notification.routes";
 
 dotenv.config();
 
@@ -27,7 +28,7 @@ app.use(
 );
 
 // ROUTES 
-app.use("/api/v1", userRouter, courseRouter);
+app.use("/api/v1", userRouter, courseRouter, notificationRouter);
 
 // API HEALTH
 app.get("/health", (req: Request, res: Response, next: NextFunction) => {
