@@ -9,7 +9,7 @@ import path from "node:path";
 import sendMail from "../utils/sendMail";
 import { sendToken } from "../utils/jwt";
 import { redis } from "../utils/redis";
-import { getUserById } from "../services/user.service";
+import { getAllUsersService, getUserById, updateUserRoleService } from "../services/user.service";
 import cloudinary from "cloudinary";
 dotenv.config();
 
@@ -384,6 +384,65 @@ export const updateProfilePicture = CatchAsyncErrors(
       });
     } catch (error: any) {
       console.log(error);
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+
+// get all users --- only for admin
+export const getAllUsers = CatchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      getAllUsersService(res);
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+// update user role --- only for admin
+export const updateUserRole = CatchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, role } = req.body;
+      const isUserExist = await UserModel.findOne({ email });
+      if (isUserExist) {
+        const id = isUserExist._id;
+        updateUserRoleService(res, id.toString(), role);
+      } else {
+        res.status(400).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+// Delete user --- only for admin
+export const deleteUser = CatchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+
+      const user = await UserModel.findById(id);
+
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
+
+      await user.deleteOne({ id });
+
+      await redis.del(id?.toString() as string);
+
+      res.status(200).json({
+        success: true,
+        message: "User deleted successfully",
+      });
+    } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
