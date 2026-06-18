@@ -13,6 +13,7 @@ import courseRouter from "./routes/course.routes";
 import notificationRouter from "./routes/notification.routes";
 import orderRouter from "./routes/order.routes";
 import analyticsRouter from "./routes/analytics.routes";
+import layoutRouter from "./routes/layout.routes";
 
 dotenv.config();
 
@@ -30,7 +31,7 @@ app.use(
 );
 
 // ROUTES 
-app.use("/api/v1", userRouter, courseRouter, notificationRouter, orderRouter, analyticsRouter);
+app.use("/api/v1", userRouter, courseRouter, notificationRouter, orderRouter, analyticsRouter, layoutRouter);
 
 // API HEALTH
 app.get("/health", (req: Request, res: Response, next: NextFunction) => {
