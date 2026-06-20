@@ -1,5 +1,5 @@
 import express from "express";
-import { activateUser, registerUser, loginUser, logoutUser, refreshAccessToken, getUserInfo, socialAuth, updateUserInfo, updatePassword, updateProfilePicture, updateUserRole, deleteUser, getAllUsers } from "../controllers/user.controller";
+import { activateUser, registerUser, loginUser, logoutUser, refreshAccessToken, getUserInfo, updateUserInfo, updatePassword, updateProfilePicture, updateUserRole, deleteUser, getAllUsers } from "../controllers/user.controller";
 import { authorizeRoles, isAuthenticated } from "../middlewares/auth";
 
 const userRouter = express.Router();
@@ -10,7 +10,6 @@ userRouter.post("/login", loginUser);
 userRouter.get("/logout", isAuthenticated, logoutUser);
 userRouter.get("/refresh", refreshAccessToken);
 userRouter.get("/me", isAuthenticated, getUserInfo);
-userRouter.post("/socialauth", socialAuth);
 userRouter.put("/update-user-info", isAuthenticated, updateUserInfo);
 userRouter.put("/update-user-password", isAuthenticated, updatePassword);
 userRouter.put("/update-user-avatar", isAuthenticated, updateProfilePicture);

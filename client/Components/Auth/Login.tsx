@@ -5,13 +5,10 @@ import * as Yup from "yup";
 import {
   AiOutlineEye,
   AiOutlineEyeInvisible,
-  AiFillGithub,
 } from "react-icons/ai";
-import { FcGoogle } from "react-icons/fc";
 import { styles } from "../../styles/styles";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
 import { toast } from "react-hot-toast";
-// import {signIn} from "next-auth/react";
 
 type Props = {
   setRoute: (route: string) => void;
@@ -41,7 +38,7 @@ const Login: FC<Props> = ({ setRoute, setOpen,refetch }) => {
     if (isSuccess) {
       toast.success("Login Successfully!");
       setOpen(false);
-      // refetch();
+      refetch();
     }
     if (error) {
       if ("data" in error) {
@@ -109,18 +106,7 @@ const Login: FC<Props> = ({ setRoute, setOpen,refetch }) => {
         <div className="w-full mt-5">
           <input type="submit" value="Login" className={`${styles.button}`} />
         </div>
-        <br />
-        <h5 className="text-center pt-4 font-Poppins text-[14px] text-black dark:text-white">
-          Or join with
-        </h5>
-        <div className="flex items-center justify-center my-3">
-          <FcGoogle size={30} className="cursor-pointer mr-2"
-          // onClick={() => signIn("google")}
-          />
-          <AiFillGithub size={30} className="cursor-pointer ml-2" 
-          // onClick={() => signIn("github")}
-           />
-        </div>
+
         <h5 className="text-center pt-4 font-Poppins text-[14px]">
           Not have any account?{" "}
           <span
