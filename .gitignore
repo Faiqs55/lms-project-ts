@@ -136,7 +136,6 @@ nest-cli.json
 
 # Gatsby
 .cache/
-public/
 
 # Storybook
 storybook-static/

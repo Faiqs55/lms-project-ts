@@ -9,7 +9,7 @@ import Login from "../Components/Auth/Login";
 import SignUp from "../Components/Auth/SignUp";
 import Verification from "../Components/Auth/Verification";
 import Image from "next/image";
-import avatar from "../public/avatar.jpg";
+import avatar from "../public/avatar.png";
 import { useLogOutQuery } from "@/redux/features/auth/authApi";
 import { toast } from "react-hot-toast";
 import { useLoadUserQuery } from "../redux/features/api/apiSlice";

@@ -5,7 +5,7 @@ import React, { FC, useState } from "react";
 import { BiSearch } from "react-icons/bi";
 import { useRouter } from "next/navigation";
 import img1 from "../../public/banner-img-1.png"
-import personImg from "../../public/person1.avif"
+import personImg from "../../public/person1.jpg"
 
 type Props = {};
 
