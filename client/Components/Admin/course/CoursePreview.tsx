@@ -39,7 +39,7 @@ const CoursePreview: FC<Props> = ({
       <div className="w-full relative">
         <div className="w-full mt-10">
           <CoursePlayer
-            videoUrl={courseData?.demoURL}
+            videoURL={courseData?.demoURL}
             title={courseData?.title}
           />
         </div>

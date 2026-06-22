@@ -2,11 +2,11 @@ import React, { FC, useEffect, useState } from "react";
 import axios from "axios";
 
 type Props = {
-  videoUrl: string;
+  videoURL: string;
   title: string;
 };
 
-const CoursePlayer: FC<Props> = ({ videoUrl }) => {
+const CoursePlayer: FC<Props> = ({ videoURL }) => {
   const [videoData, setVideoData] = useState({
     otp: "",
     playbackInfo: "",
@@ -15,12 +15,14 @@ const CoursePlayer: FC<Props> = ({ videoUrl }) => {
   useEffect(() => {
     axios
       .post(`${process.env.NEXT_PUBLIC_SERVER_URI}getVdoCipherOTP`, {
-        videoId: videoUrl,
+        videoId: videoURL,
       })
       .then((res) => {
+        console.log(res);
+        
         setVideoData(res.data);
       });
-  }, [videoUrl]);
+  }, [videoURL]);
 
   return (
     <div

@@ -39,9 +39,10 @@ interface itemProps {
 const Item: FC<itemProps> = ({ title, to, icon, selected, setSelected }) => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  
+
   return (
     <MenuItem
+      component={<Link href={to} />}
       active={selected === title}
       onClick={() => setSelected(title)}
       icon={icon}
@@ -59,9 +60,7 @@ const Item: FC<itemProps> = ({ title, to, icon, selected, setSelected }) => {
         },
       }}
     >
-      <Link href={to}>
       <Typography className="text-[16px]! font-Poppins!">{title}</Typography>
-      </Link>
     </MenuItem>
   );
 };
@@ -88,9 +87,8 @@ const Sidebar = () => {
     <Box
       sx={{
         "& .pro-sidebar-inner": {
-          background: `${
-            theme === "dark" ? "#111C43 !important" : "#fff !important"
-          }`,
+          background: `${theme === "dark" ? "#111C43 !important" : "#fff !important"
+            }`,
         },
         "& .pro-icon-wrapper": {
           backgroundColor: "transparent !important",
@@ -140,6 +138,17 @@ const Sidebar = () => {
             icon={isCollapsed ? <ArrowForwardIosIcon /> : undefined}
             rootStyles={{
               margin: "10px 0 20px 0",
+              "& .ps-menu-button": {
+                "&:hover": {
+                  color: "#868dfb !important",
+                  backgroundColor: theme === "dark" ? "#111C49 !important" : "#f0f0f0 !important",
+                },
+              },
+              "&.ps-active": {
+                "& .ps-menu-button": {
+                  color: "#6870fa !important",
+                },
+              },
             }}
           >
             {!isCollapsed && (
@@ -151,11 +160,9 @@ const Sidebar = () => {
                   ml: "15px",
                 }}
               >
-                <Link href="/" className="block">
-                  <h3 className="text-[25px] font-Poppins uppercase dark:text-white text-black">
-                    ELearning
-                  </h3>
-                </Link>
+                <h3 className="text-[25px] font-Poppins uppercase dark:text-white text-black">
+                  ELearning
+                </h3>
                 <IconButton
                   onClick={() => setIsCollapsed(!isCollapsed)}
                   className="inline-block"
