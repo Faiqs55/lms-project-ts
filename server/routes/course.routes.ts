@@ -29,7 +29,7 @@ courseRouter.put("/add-question", isAuthenticated, addQuestion);
 courseRouter.put("/add-answer", isAuthenticated, addAnwser);
 
 courseRouter.put("/add-review/:id", isAuthenticated, addReviewController);
-courseRouter.put("/add-review-reply/", isAuthenticated, authorizeRoles("admin"), addReviewReplyController);
+courseRouter.put("/add-review-reply", isAuthenticated, authorizeRoles("admin"), addReviewReplyController);
 courseRouter.get("/get-all-courses-admin", isAuthenticated, authorizeRoles("admin"), getAdminAllCourses);
 courseRouter.post("/getVdoCipherOTP", generateVideoUrl);
 courseRouter.delete("/delete-course/:id", isAuthenticated, authorizeRoles("admin"), deleteCourse);

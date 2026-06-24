@@ -49,14 +49,16 @@ type Props = {
 };
 
 export default function OrdersAnalytics({ isDashboard }: Props) {
-  const {data, isLoading } = useGetOrdersAnalyticsQuery({});
+  const {data, isLoading } = useGetOrdersAnalyticsQuery({});  
 
   const analyticsData: any = [];
 
   data &&
     data.orders.last12Months.forEach((item: any) => {
-      analyticsData.push({ name: item.name, Count: item.count });
+      analyticsData.push({ name: item.month, Count: item.count });
     });
+
+    
 
   return (
     <>

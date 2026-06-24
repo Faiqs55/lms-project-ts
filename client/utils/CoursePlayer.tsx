@@ -17,9 +17,7 @@ const CoursePlayer: FC<Props> = ({ videoURL }) => {
       .post(`${process.env.NEXT_PUBLIC_SERVER_URI}getVdoCipherOTP`, {
         videoId: videoURL,
       })
-      .then((res) => {
-        console.log(res);
-        
+      .then((res) => {        
         setVideoData(res.data);
       });
   }, [videoURL]);

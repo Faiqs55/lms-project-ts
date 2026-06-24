@@ -10,6 +10,7 @@ import path from "node:path";
 import ejs from "ejs"
 import sendMail from "../utils/sendMail";
 import NotificationModel from "../models/notification.model";
+import { getIO } from "../socketServer";
 import axios from "axios";
 
 export const uploadCourse = CatchAsyncErrors(
@@ -145,10 +146,10 @@ export const getCourseByUser = CatchAsyncErrors(
       const courseId = req.params.id;
 
       const courseExists = userCourseList?.find(
-        (course: any) => course._id.toString() === courseId
+        (course: any) => course.courseId.toString() === courseId
       );
 
-      if (!courseExists) {
+      if (!courseExists && req.user?.role !== "admin") {
         return next(
           new ErrorHandler("You are not eligible to access this course", 404)
         );
@@ -208,11 +209,19 @@ export const addQuestion = CatchAsyncErrors(
       // save the updated course
       await course?.save();
 
-      await NotificationModel.create({
+      const questionNotification = await NotificationModel.create({
         userId: req?.user?._id.toString() as string,
         title: "New Question Received",
         message: `You have a new question in ${couseContent.title}`
-      })
+      });
+
+      // Emit socket event so admin dashboard plays notification sound
+      try {
+        getIO().emit("newNotification", {
+          title: questionNotification.title,
+          message: questionNotification.message,
+        });
+      } catch (_) {}
 
       res.status(200).json({
         success: true,
@@ -326,7 +335,7 @@ export const addReviewController = CatchAsyncErrors(async (req: Request, res: Re
     const courseId = req.params.id;
 
     const courseExists = userCourseList?.some((course: any) => course.courseId.toString() === courseId?.toString());
-    if (!courseExists) {
+    if (!courseExists && req.user?.role !== "admin") {
       return next(new ErrorHandler("You dont have access to this course.", 403));
     }
 
@@ -354,6 +363,20 @@ export const addReviewController = CatchAsyncErrors(async (req: Request, res: Re
     await redis.set(courseId as string, JSON.stringify(course), "EX", 604800);
 
     // NOTIFICATION 
+
+    const notification = await NotificationModel.create({
+        userId: req.user?._id.toString() || "",
+        title: "New Review Received",
+        message: `${req.user?.name} has given a review in ${course?.name}`,
+      });
+
+    // Emit socket event so the admin dashboard plays the notification sound
+    try {
+      getIO().emit("newNotification", {
+        title: notification.title,
+        message: notification.message,
+      });
+    } catch (_) {}
 
     res.status(200).json({
       success: true,

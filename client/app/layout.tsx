@@ -6,6 +6,7 @@ import { Toaster } from "react-hot-toast";
 import { Providers } from "./Provider";
 import CustomProvider from "@/Components/CustomProvider";
 
+
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],

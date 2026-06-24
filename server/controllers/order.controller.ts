@@ -10,11 +10,26 @@ import sendMail from "../utils/sendMail";
 import { redis } from "../utils/redis";
 import NotificationModel from "../models/notification.model";
 import { getAllOrdersService, newOrder } from "../services/order.service";
+require("dotenv").config();
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 // Create Order 
 export const createOrderController = CatchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { courseId, paymentInfo } = req.body as IOrder;
+
+        if (paymentInfo) {
+        if ("id" in paymentInfo) {
+          const paymentIntentId = paymentInfo.id;
+          const paymentIntent = await stripe.paymentIntents.retrieve(
+            paymentIntentId
+          );
+
+          if (paymentIntent.status !== "succeeded") {
+            return next(new ErrorHandler("Payment not authorized!", 400));
+          }
+        }
+      }
 
         const user = await UserModel.findById(req?.user?._id);
         const courseAlreadyPurchased = user?.courses.some((course: any) => course._id.toString() === courseId.toString());
@@ -93,4 +108,49 @@ export const getAllOrders = CatchAsyncErrors(
             return next(new ErrorHandler(error.message, 500));
         }
     }
+);
+
+
+//  send stripe publishble key
+export const sendStripePublishableKey = CatchAsyncErrors(
+  async (req: Request, res: Response) => {
+    res.status(200).json({
+      publishablekey: process.env.STRIPE_PUBLISHABLE_KEY,
+    });
+  }
+);
+
+// new payment
+export const newPayment = CatchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const myPayment = await stripe.paymentIntents.create({
+        amount: req.body.amount,
+        currency: "USD",
+        description: "E-learning course services",
+        metadata: {
+          company: "E-Learning",
+        },
+        automatic_payment_methods: {
+          enabled: true,
+        },
+        shipping: {
+          name: "Harmik Lathiya",
+          address: {
+            line1: "510 Townsend St",
+            postal_code: "98140",
+            city: "San Francisco",
+            state: "CA",
+            country: "US",
+          },
+        },
+      });
+      res.status(201).json({
+        success: true,
+        client_secret: myPayment.client_secret,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
 );

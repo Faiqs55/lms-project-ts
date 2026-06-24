@@ -28,6 +28,7 @@ export const updateNotificationController = CatchAsyncErrors(async (req: Request
         }
 
         notificaiton.status = "read";
+        await notificaiton.save();
 
         const notifications = await NotificationModel.find().sort({ createdAt: -1 });
 

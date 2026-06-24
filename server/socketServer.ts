@@ -1,0 +1,27 @@
+import { Server as SocketIOServer } from "socket.io";
+import http from "http";
+
+let io: SocketIOServer;
+
+export const getIO = (): SocketIOServer => {
+  if (!io) throw new Error("Socket.io not initialized!");
+  return io;
+};
+
+export const initSocketServer = (server: http.Server) => {
+  io = new SocketIOServer(server);
+
+  io.on("connection", (socket) => {
+    console.log("A user connected");
+
+    // Listen for 'notification' event from the frontend
+    socket.on("notification", (data) => {
+      // Broadcast the notification data to all connected clients (admin dashboard)
+      io.emit("newNotification", data);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("A user disconnected");
+    });
+  });
+};
