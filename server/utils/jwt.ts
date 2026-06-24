@@ -38,14 +38,16 @@ export const sendToken = (user: IUser, statusCode: number, res: Response, sendAc
         expires: new Date(Date.now() + accessTokenExpiresIn * 60 * 60 * 1000),
         maxAge: accessTokenExpiresIn * 60 * 60 * 1000,
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        secure: process.env.NODE_ENV === "production",
     }
 
     const refreshTokenOptions: ITokenOptions = {
         expires: new Date(Date.now() + refreshTokenExpiresIn * 60 * 60 * 1000),
         maxAge: refreshTokenExpiresIn * 60 * 60 * 1000,
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        secure: process.env.NODE_ENV === "production",
     }
 
     if (process.env.NODE_ENV === "production") {
