@@ -23,10 +23,6 @@ export const navItemsData = [
     name: "Policy",
     url: "/policy",
   },
-  {
-    name: "FAQ",
-    url: "/faq",
-  },
 ];
 
 const NavItems: FC<Props> = ({ activeItem, isMobile }) => {
