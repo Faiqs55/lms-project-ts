@@ -2,7 +2,7 @@
 import { useGetUsersAllCoursesQuery } from "../../redux/features/course/courseApi";
 import { useGetHeroDataQuery } from "@/redux/features/layout/layoutApi";
 import { useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import Loader from "../../Components/Loader/Loader";
 import Header from "../../Components/Header";
 import Heading from "../../utils/Heading";
@@ -43,7 +43,8 @@ const Page = (props: Props) => {
   const categories = categoriesData?.layout?.categories;
 
   return (
-    <div>
+    <Suspense fallback={<Loader/>}>
+      <div>
       {isLoading ? (
         <Loader />
       ) : (
@@ -109,6 +110,7 @@ const Page = (props: Props) => {
         </>
       )}
     </div>
+    </Suspense>
   );
 };
 
