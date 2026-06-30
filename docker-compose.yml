@@ -10,7 +10,7 @@ services:
       - "3000:3000"
 
     depends_on:
-      - backend
+      - lms-backend
 
     env_file:
       - ./client/.env
